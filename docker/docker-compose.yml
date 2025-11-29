@@ -1,0 +1,25 @@
+networks:
+  iot-platform:
+    external: true
+    name: iot-platform
+
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: timescaledb
+    restart: unless-stopped
+    networks:
+      - iot-platform
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-StrongPassword123!}
+      - POSTGRES_DB=iot_data
+      - POSTGRES_USER=postgres
+    volumes:
+      - ./data/timescaledb:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
