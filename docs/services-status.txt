@@ -1,0 +1,12 @@
+NAMES               IMAGE                                 STATUS                       PORTS
+nginx               goharbor/nginx-photon:v2.14.1         Up 6 minutes (healthy)       0.0.0.0:80->8080/tcp, [::]:80->8080/tcp
+harbor-jobservice   goharbor/harbor-jobservice:v2.14.1    Up 6 minutes (healthy)       
+harbor-core         goharbor/harbor-core:v2.14.1          Up 7 minutes (healthy)       
+registryctl         goharbor/harbor-registryctl:v2.14.1   Up 7 minutes (healthy)       
+harbor-db           goharbor/harbor-db:v2.14.1            Up 7 minutes (healthy)       
+redis               goharbor/redis-photon:v2.14.1         Up 7 minutes (healthy)       
+registry            goharbor/registry-photon:v2.14.1      Up 7 minutes (healthy)       
+harbor-portal       goharbor/harbor-portal:v2.14.1        Up 7 minutes (healthy)       
+harbor-log          goharbor/harbor-log:v2.14.1           Up 7 minutes (healthy)       127.0.0.1:1514->10514/tcp
+kafka               confluentinc/cp-kafka:7.5.0           Up 58 minutes (healthy)      0.0.0.0:9092->9092/tcp, [::]:9092->9092/tcp, 0.0.0.0:19092->19092/tcp, [::]:19092->19092/tcp
+timescaledb         timescale/timescaledb:latest-pg15     Up About an hour (healthy)   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp
