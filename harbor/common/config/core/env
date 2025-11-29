@@ -22,8 +22,8 @@ PORTAL_URL=http://portal:8080
 TOKEN_SERVICE_URL=http://core:8080/service/token
 HARBOR_ADMIN_PASSWORD=Harbor12345
 MAX_JOB_WORKERS=10
-CORE_SECRET=PyQydUPZOqxbXGeL
-JOBSERVICE_SECRET=OrDgPy95TUItkMrq
+CORE_SECRET=XcJqDChVsJlSlJIa
+JOBSERVICE_SECRET=JzxHBw6bPvLBn366
 WITH_TRIVY=False
 CORE_URL=http://core:8080
 CORE_LOCAL_URL=http://127.0.0.1:8080
@@ -34,15 +34,15 @@ READ_ONLY=false
 RELOAD_KEY=
 REGISTRY_CONTROLLER_URL=http://registryctl:8080
 REGISTRY_CREDENTIAL_USERNAME=harbor_registry_user
-REGISTRY_CREDENTIAL_PASSWORD=YJCYmKdbXzTUDdpnPOjRHzhCGoYLgVX0
-CSRF_KEY=em12s2KaQm113ZqkYqBuV79rRoU7bw6G
-ROBOT_SCANNER_NAME_PREFIX=ejQxTO29
+REGISTRY_CREDENTIAL_PASSWORD=R2FTsinXJ2Vn0UuIFtNispoDGNmkDRjS
+CSRF_KEY=U9dMGriV5nQvFf1B06UbbUD5or1kzShp
+ROBOT_SCANNER_NAME_PREFIX=QthzEM2Y
 PERMITTED_REGISTRY_TYPES_FOR_PROXY_CACHE=docker-hub,harbor,azure-acr,ali-acr,aws-ecr,google-gcr,docker-registry,github-ghcr,jfrog-artifactory
 REPLICATION_ADAPTER_WHITELIST=ali-acr,aws-ecr,azure-acr,docker-hub,docker-registry,github-ghcr,google-gcr,harbor,huawei-SWR,jfrog-artifactory,tencent-tcr,volcengine-cr
 
 HTTP_PROXY=
 HTTPS_PROXY=
-NO_PROXY=db,.internal,registryctl,jobservice,log,exporter,trivy-adapter,postgresql,127.0.0.1,.local,localhost,registry,nginx,portal,core,redis
+NO_PROXY=redis,.internal,db,log,jobservice,127.0.0.1,registryctl,portal,exporter,trivy-adapter,localhost,registry,.local,core,postgresql,nginx
 
 PORT=8080
 
