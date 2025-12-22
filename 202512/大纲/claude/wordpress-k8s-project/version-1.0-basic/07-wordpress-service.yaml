@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+  namespace: wordpress
+  labels:
+    app: wordpress
+spec:
+  # NodePort类型：可以从集群外访问
+  type: NodePort
+  
+  selector:
+    app: wordpress
+    tier: frontend
+  
+  ports:
+  - name: http
+    port: 80           # Service端口
+    targetPort: 80     # Pod端口
+    nodePort: 30080    # 节点端口（可选，不指定会自动分配）
+    protocol: TCP
+
+---
+# 说明：
+# WordPress Service - NodePort类型
+#
+# 为什么用NodePort？
+# - 版本1.0是基础版，先能访问即可
+# - 没有LoadBalancer（云服务商支持）
+# - 还没安装Ingress Controller
+# - NodePort可以从集群外直接访问
+#
+# NodePort工作原理：
+# 1. 在每个节点上开放nodePort端口
+# 2. 访问 <任意节点IP>:<nodePort> 
+# 3. 流量转发到Service ClusterIP
+# 4. 再转发到后端Pod
+#
+# 端口范围：
+# - 默认: 30000-32767
+# - 可在kube-apiserver配置修改
+#
+# 访问方式：
+# http://192.168.226.131:30080  (master)
+# http://192.168.226.132:30080  (node1)
+# http://192.168.226.133:30080  (node2)
+# 
+# 任意一个节点IP都可以访问！
+#
+# 版本演进：
+# - 版本1.0: NodePort
+# - 版本2.0: Ingress (域名访问)
+# - 版本4.0: Ingress + HTTPS
+#
+# NodePort的缺点：
+# - 端口不友好（需要记住30080）
+# - 不支持域名
+# - 不支持HTTPS（需要额外配置）
+# - 不是生产环境推荐方案
+#
+# 生产环境推荐：
+# - LoadBalancer (云环境)
+# - Ingress + LoadBalancer
+# - Ingress + NodePort (裸金属)

@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  namespace: wordpress
+  labels:
+    app: wordpress
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: wordpress
+        tier: frontend
+    spec:
+      containers:
+      - name: wordpress
+        image: wordpress:6.4-apache
+        
+        # 环境变量配置
+        env:
+        # WordPress连接MySQL的配置
+        - name: WORDPRESS_DB_HOST
+          value: mysql:3306  # 使用Service DNS名称
+        - name: WORDPRESS_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-database
+        - name: WORDPRESS_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-user
+        - name: WORDPRESS_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-password
+        
+        # 容器端口
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        
+        # 挂载WordPress内容目录
+        volumeMounts:
+        - name: wordpress-storage
+          mountPath: /var/www/html
+      
+      # 定义卷
+      volumes:
+      - name: wordpress-storage
+        persistentVolumeClaim:
+          claimName: wordpress-pvc
+
+---
+# 说明：
+# WordPress Deployment配置
+#
+# WordPress镜像：
+# - wordpress:6.4-apache: 包含Apache + PHP + WordPress
+# - wordpress:6.4-fpm: 需要单独的nginx
+# - 使用apache版本更简单，适合入门
+#
+# 环境变量说明：
+# WORDPRESS_DB_HOST: 
+#   - 使用Service名称 "mysql"
+#   - Kubernetes DNS自动解析为Service的ClusterIP
+#   - 格式: <service-name>:<port>
+#   - 完整FQDN: mysql.wordpress.svc.cluster.local:3306
+#
+# 数据持久化：
+# - /var/www/html: WordPress安装目录
+# - 包含wp-content（主题、插件、上传）
+# - 包含wp-config.php（配置文件）
+# - 首次启动会自动创建WordPress文件
+#
+# 启动流程：
+# 1. 容器启动
+# 2. WordPress检查/var/www/html是否为空
+# 3. 如果为空，复制WordPress文件
+# 4. 连接MySQL初始化数据库
+# 5. 等待用户访问完成安装
+#
+# 依赖关系：
+# - WordPress依赖MySQL
+# - 需要MySQL先启动
+# - Kubernetes不保证启动顺序
+# - WordPress会自动重试连接
+#
+# 常见问题：
+# Q: WordPress一直重启？
+# A: 检查MySQL是否正常，检查数据库连接信息
+#
+# Q: "Error establishing database connection"？
+# A: 
+#   1. 检查MySQL Pod是否Running
+#   2. 检查Service是否正常
+#   3. 检查Secret是否正确
+#   4. 进入WordPress容器测试: ping mysql

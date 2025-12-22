@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wordpress-pvc
+  namespace: wordpress
+  labels:
+    app: wordpress
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+# 说明：
+# WordPress的PVC用于存储：
+# - 上传的图片、附件
+# - 主题文件
+# - 插件文件
+# - wp-config.php等配置文件
+#
+# 存储大小建议：
+# - 小型博客: 5-10Gi
+# - 中型博客: 10-20Gi
+# - 大型博客: 20Gi+
+#
+# 注意事项：
+# - WordPress是无状态应用（数据在MySQL）
+# - 但上传的文件需要持久化
+# - 多副本WordPress需要共享存储（RWX）或对象存储
+# - 版本1.0单副本，RWO足够

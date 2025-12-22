@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: wordpress
+  labels:
+    app: mysql
+spec:
+  # ClusterIP类型：只能在集群内部访问（默认类型）
+  type: ClusterIP
+  
+  # 选择器：转发流量到匹配标签的Pod
+  selector:
+    app: mysql
+    tier: database
+  
+  # 端口映射
+  ports:
+  - name: mysql
+    port: 3306        # Service端口
+    targetPort: 3306  # Pod端口
+    protocol: TCP
+
+---
+# 说明：
+# Service 提供稳定的网络端点，实现服务发现和负载均衡
+#
+# Service类型：
+# 1. ClusterIP（默认）: 
+#    - 只能集群内访问
+#    - 分配一个集群内部IP
+#    - 适合数据库、缓存等后端服务
+#
+# 2. NodePort:
+#    - 在每个节点上开放端口（30000-32767）
+#    - 可以从集群外访问
+#    - 适合开发测试
+#
+# 3. LoadBalancer:
+#    - 需要云服务商支持
+#    - 自动创建外部负载均衡器
+#    - 适合生产环境暴露服务
+#
+# 4. ExternalName:
+#    - DNS CNAME记录
+#    - 适合引用外部服务
+#
+# 服务发现方式：
+# 1. DNS（推荐）:
+#    - 同namespace: mysql
+#    - 跨namespace: mysql.wordpress.svc.cluster.local
+#    - 完整FQDN: mysql.wordpress.svc.cluster.local
+#
+# 2. 环境变量（不推荐）:
+#    - MYSQL_SERVICE_HOST
+#    - MYSQL_SERVICE_PORT
+#
+# 端口说明：
+# - port: Service监听的端口（集群内其他服务访问这个端口）
+# - targetPort: Pod监听的端口（流量最终转发到这个端口）
+# - nodePort: 节点端口（仅NodePort类型）
+#
+# 测试Service：
+# kubectl get svc -n wordpress
+# kubectl describe svc mysql -n wordpress
+# 
+# 在集群内测试连接：
+# kubectl run -it --rm debug --image=mysql:8.0 --restart=Never -n wordpress -- mysql -h mysql -u wordpress -p

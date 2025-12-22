@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: wordpress
+  labels:
+    app: mysql
+    tier: database
+spec:
+  # 单副本（数据库通常不能简单多副本，需要主从复制）
+  replicas: 1
+  
+  # 选择器必须匹配Pod标签
+  selector:
+    matchLabels:
+      app: mysql
+      tier: database
+  
+  # Pod模板
+  template:
+    metadata:
+      labels:
+        app: mysql
+        tier: database
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0
+        
+        # 环境变量：从Secret读取
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-root-password
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-database
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-user
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-password
+        
+        # 容器端口
+        ports:
+        - containerPort: 3306
+          name: mysql
+          protocol: TCP
+        
+        # 挂载持久化卷
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+      
+      # 定义卷：关联到PVC
+      volumes:
+      - name: mysql-storage
+        persistentVolumeClaim:
+          claimName: mysql-pvc
+
+---
+# 说明：
+# Deployment 是最常用的工作负载控制器，用于管理无状态应用（虽然MySQL是有状态的）
+#
+# 为什么用Deployment而不是StatefulSet？
+# - 版本1.0是基础版，先让系统跑起来
+# - 单副本MySQL用Deployment也可以
+# - 版本3.0会改用StatefulSet实现主从架构
+#
+# 关键概念：
+# 1. replicas: 副本数量，控制器会确保始终有这么多Pod运行
+# 2. selector: 通过标签选择要管理的Pod
+# 3. template: Pod模板，定义Pod的规格
+# 4. env: 环境变量，可以从Secret/ConfigMap注入
+# 5. volumeMounts: 容器内的挂载点
+# 6. volumes: Pod级别的卷定义
+#
+# MySQL镜像说明：
+# - 官方镜像会自动初始化数据库
+# - 数据存储在 /var/lib/mysql
+# - 首次启动会根据环境变量创建用户和数据库
+#
+# 常用命令：
+# kubectl get deployment -n wordpress
+# kubectl describe deployment mysql -n wordpress
+# kubectl logs deployment/mysql -n wordpress
+# kubectl exec -it deployment/mysql -n wordpress -- mysql -u root -p

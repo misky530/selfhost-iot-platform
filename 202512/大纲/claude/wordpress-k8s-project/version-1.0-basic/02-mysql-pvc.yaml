@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: wordpress
+  labels:
+    app: mysql
+spec:
+  # 访问模式：ReadWriteOnce表示只能被单个节点以读写方式挂载
+  accessModes:
+    - ReadWriteOnce
+  
+  # 使用默认StorageClass (local-path)
+  storageClassName: local-path
+  
+  # 请求5GB存储空间
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+# 说明：
+# PersistentVolumeClaim (PVC) 是用户对存储的请求
+#
+# 访问模式类型：
+# - ReadWriteOnce (RWO): 单节点读写（最常用）
+# - ReadOnlyMany (ROX): 多节点只读
+# - ReadWriteMany (RWX): 多节点读写（需要特殊存储后端如NFS）
+#
+# local-path StorageClass：
+# - 使用节点本地磁盘
+# - 自动创建PV
+# - Pod重启后可能调度到不同节点，数据会丢失（除非使用nodeAffinity固定）
+# - 适合学习，不适合生产环境的关键数据
+#
+# 生命周期：
+# 1. PVC创建 → Pending状态
+# 2. Pod使用PVC → 触发PV创建（动态供给）
+# 3. PVC绑定到PV → Bound状态
+# 4. Pod挂载卷 → 可以读写数据
+#
+# 查看PVC状态：
+# kubectl get pvc -n wordpress
+# kubectl describe pvc mysql-pvc -n wordpress
