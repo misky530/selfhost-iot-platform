@@ -30,3 +30,12 @@ network:
  sudo netplan apply
 ```
 
+# 2 代理
+```shell
+# 测试代理连接
+curl -x http://127.0.0.1:7890 https://www.google.com
+
+10.0.73.30
+curl -x http://10.0.73.30:7897 https://www.google.com
+
+```
